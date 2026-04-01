@@ -75,4 +75,5 @@ mitoo.life/
 - [x] **Profile Images**: Integração com Supabase Storage e seletor de fotos no perfil.
 - [x] **Test Infrastructure**: Ambiente Jest configurado e testes de Core passando.
 - [x] **Git Repository**: Conectado e sincronizado em: https://github.com/lucasraz/mitoo.life
+- [x] **Deployment Config**: Vercel/Cloudflare Pages configurados com redirecionamento de SPA.
 

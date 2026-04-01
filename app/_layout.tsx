@@ -42,10 +42,17 @@ export default function RootLayout() {
     }
   }, [user, loading, segments]);
 
+  // Ajuda a depurar telas brancas na Web
   if (loading || !fontsLoaded) {
     return (
-      <View style={{ flex: 1, backgroundColor: theme.background, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ flex: 1, backgroundColor: theme.background, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
         <ActivityIndicator size="large" color={theme.primary} />
+        {/* Mostra um pequeno debug na Web depois de um tempo se algo der errado */}
+        {process.env.NODE_ENV === 'production' && (
+           <View style={{ marginTop: 20 }}>
+             <ActivityIndicator size="small" color={theme.text} style={{ opacity: 0.3 }} />
+           </View>
+        )}
       </View>
     );
   }
