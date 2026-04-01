@@ -27,6 +27,7 @@ Este é o documento vivo do projeto **Mitoo.Life**. Ele contém a definição da
 -   **Estado**: Zustand / Context API.
 -   **Animações**: Reanimated 3.
 -   **Design**: Temas dinâmicos baseados no horário e paleta de humor.
+-   **Testes**: Jest + React Native Testing Library (Configurado).
 
 ---
 
@@ -57,7 +58,7 @@ mitoo.life/
 │   ├── ui/             # Componentes, Temas e Animações
 │   ├── hooks/          # Hooks customizados (useTheme, useSupabase)
 │   └── store/          # Zustand (Global State)
-├── tests/              # Testes Automatizados (Vitest/Jest)
+├── tests/              # Testes Automatizados (Jest - Configurado)
 └── ANTIGRAVITY.md      # Este documento
 ```
 
@@ -72,4 +73,6 @@ mitoo.life/
 - [x] **Theme Engine**: Hook para detecção de período e aplicação de cores dinâmicas criado.
 - [x] **Comments Core**: Repositório e UI de comentários para posts e diário integrados.
 - [x] **Profile Images**: Integração com Supabase Storage e seletor de fotos no perfil.
+- [x] **Test Infrastructure**: Ambiente Jest configurado e testes de Core passando.
+- [x] **Git Repository**: Conectado e sincronizado em: https://github.com/lucasraz/mitoo.life
 

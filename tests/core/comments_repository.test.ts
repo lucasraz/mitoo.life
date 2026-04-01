@@ -51,7 +51,11 @@ describe('CommentsRepository', () => {
     });
 
     (supabase.from as jest.Mock).mockReturnValue({
-      insert: jest.fn().mockResolvedValue({ data: mockComment, error: null }),
+      insert: jest.fn().mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          single: jest.fn().mockResolvedValue({ data: mockComment, error: null }),
+        }),
+      }),
     });
 
     const newComment = await CommentsRepository.createComment({
