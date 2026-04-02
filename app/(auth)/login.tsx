@@ -17,7 +17,8 @@ import { useAuthStore } from '../../src/store/auth_store';
 import { useThemePeriod } from '../../src/hooks/useThemePeriod';
 import { LogIn, UserPlus } from 'lucide-react-native';
 
-const SCREEN_WIDTH = Dimensions.get('window').width;
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const IS_DESKTOP = SCREEN_WIDTH > 768;
 
 export default function LoginScreen() {
   const [isLogin, setIsLogin] = useState(true);
@@ -51,7 +52,10 @@ export default function LoginScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={[styles.container, { backgroundColor: theme.background }]}
     >
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        contentContainerStyle={[styles.scrollContent, IS_DESKTOP && { justifyContent: 'center', flexGrow: 1 }]} 
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.header}>
           <Image
             source={require('../../assets/logo.png')}
@@ -152,12 +156,14 @@ const styles = StyleSheet.create({
   scrollContent: { padding: 32, paddingTop: 100 },
   header: { alignItems: 'center', marginBottom: 48 },
   logoImage: {
-    width: SCREEN_WIDTH - 32,
-    height: (SCREEN_WIDTH - 32) * 0.63,
+    width: IS_DESKTOP ? 420 : SCREEN_WIDTH - 64,
+    height: (IS_DESKTOP ? 420 : SCREEN_WIDTH - 64) * 0.63,
+    maxHeight: SCREEN_HEIGHT * 0.35,
     marginBottom: 8,
+    alignSelf: 'center'
   },
   subtitle: { fontSize: 16, textAlign: 'center', marginTop: 8, paddingHorizontal: 20 },
-  form: { width: '100%' },
+  form: { width: '100%', maxWidth: 420, alignSelf: 'center' },
   inputGroup: { marginBottom: 20 },
   label: { fontSize: 14, fontWeight: '700', marginBottom: 8, marginLeft: 4, opacity: 0.8 },
   input: {
