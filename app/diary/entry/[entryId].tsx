@@ -10,7 +10,7 @@ import {
   Modal,
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
-import { ArrowLeft, MessageCircle, Clock, Handshake } from 'lucide-react-native';
+import { ArrowLeft, MessageCircle, Clock, Heart } from 'lucide-react-native';
 import { useThemePeriod } from '../../../src/hooks/useThemePeriod';
 import { DiaryRepository, DiaryEntry } from '../../../src/core/diary_repository';
 import { DiarySocialRepository } from '../../../src/core/diary_social_repository';
@@ -120,7 +120,7 @@ export default function DiaryEntryDetailScreen() {
             style={[styles.mitooHeaderBtn, hasReacted && { backgroundColor: theme.primary + '25' }]}
             onPress={handleReaction}
           >
-            <Handshake size={18} color={hasReacted ? theme.primary : theme.text} opacity={hasReacted ? 1 : 0.6} />
+            <Heart size={18} color={hasReacted ? theme.primary : theme.text} opacity={hasReacted ? 1 : 0.6} />
             <Text style={[styles.mitooHeaderLabel, { color: hasReacted ? theme.primary : theme.text, opacity: hasReacted ? 1 : 0.6 }]}>
               {reactionCount > 0 ? reactionCount : 'Mitoo'}
             </Text>
@@ -181,7 +181,7 @@ export default function DiaryEntryDetailScreen() {
             style={[styles.mitooFooterBtn, hasReacted && { borderColor: theme.primary + '55', backgroundColor: theme.primary + '11' }]}
             onPress={handleReaction}
           >
-            <Handshake size={20} color={hasReacted ? theme.primary : theme.text} opacity={hasReacted ? 1 : 0.6} />
+            <Heart size={20} color={hasReacted ? theme.primary : theme.text} opacity={hasReacted ? 1 : 0.6} />
             <Text style={[styles.mitooFooterLabel, { color: hasReacted ? theme.primary : theme.text, opacity: hasReacted ? 1 : 0.6 }]}>
               {reactionCount > 0 ? `${reactionCount} Mitoos` : 'Deixar Mitoo'}
             </Text>
