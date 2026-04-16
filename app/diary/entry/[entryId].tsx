@@ -11,11 +11,11 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { ArrowLeft, MessageCircle, Clock, Handshake } from 'lucide-react-native';
-import { useThemePeriod } from '../../../../src/hooks/useThemePeriod';
-import { DiaryRepository, DiaryEntry } from '../../../../src/core/diary_repository';
-import { DiarySocialRepository } from '../../../../src/core/diary_social_repository';
-import { CommentSection } from '../../../../src/ui/components/CommentSection';
-import { logger } from '../../../../src/infra/logger';
+import { useThemePeriod } from '../../../src/hooks/useThemePeriod';
+import { DiaryRepository, DiaryEntry } from '../../../src/core/diary_repository';
+import { DiarySocialRepository } from '../../../src/core/diary_social_repository';
+import { CommentSection } from '../../../src/ui/components/CommentSection';
+import { logger } from '../../../src/infra/logger';
 
 /**
  * 🛰️ Diary Entry Detail Screen

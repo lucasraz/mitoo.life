@@ -11,9 +11,9 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { ArrowLeft, Book, MessageCircle } from 'lucide-react-native';
-import { useThemePeriod } from '../../../src/hooks/useThemePeriod';
-import { DiaryRepository, Diary, DiaryEntry } from '../../../src/core/diary_repository';
-import { logger } from '../../../src/infra/logger';
+import { useThemePeriod } from '../../src/hooks/useThemePeriod';
+import { DiaryRepository, Diary, DiaryEntry } from '../../src/core/diary_repository';
+import { logger } from '../../src/infra/logger';
 
 /**
  * 🛰️ Diary Detail Screen
