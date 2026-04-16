@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   View, 
   Text, 
@@ -8,7 +8,8 @@ import {
   RefreshControl, 
   Modal, 
   TouchableOpacity,
-  TextInput
+  TextInput,
+  Animated
 } from 'react-native';
 import { useThemePeriod } from '../../src/hooks/useThemePeriod';
 import { PostsRepository, Post } from '../../src/core/posts_repository';
@@ -46,6 +47,20 @@ export default function FeedScreen() {
   const theme = useThemePeriod();
   const language = useUIStore((state) => state.language) || 'pt';
   const t = TRANSLATIONS[language];
+
+  // Animação de piscar para o botão do manifesto
+  const blinkAnim = useRef(new Animated.Value(0.4)).current;
+
+  useEffect(() => {
+    const blinkAction = Animated.loop(
+      Animated.sequence([
+        Animated.timing(blinkAnim, { toValue: 1, duration: 800, useNativeDriver: true }),
+        Animated.timing(blinkAnim, { toValue: 0.4, duration: 800, useNativeDriver: true })
+      ])
+    );
+    blinkAction.start();
+    return () => blinkAction.stop();
+  }, [blinkAnim]);
 
   useEffect(() => {
     if (identity && identity.seenManifesto === false) {
@@ -106,24 +121,35 @@ export default function FeedScreen() {
       
     const finalName = displayName || t.greetingTraveler;
 
-    if (theme.name === 'Manhã') return `${t.greetingMorning}, ${finalName}`;
-    if (theme.name === 'Tarde') return `${t.greetingAfternoon}, ${finalName}`;
-    return `${t.greetingEvening}, ${finalName}`;
+    if (theme.name === 'Manhã') return `${t.greetingMorning},\n${finalName}`;
+    if (theme.name === 'Tarde') return `${t.greetingAfternoon},\n${finalName}`;
+    return `${t.greetingEvening},\n${finalName}`;
   };
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.header}>
-        <Text style={[styles.greeting, { color: theme.text, opacity: 0.6 }]}>
+        <Text style={[styles.greeting, { color: theme.text, opacity: 0.7 }]}>
           {getGreeting()}
         </Text>
         
         <TouchableOpacity 
-          style={[styles.manifestoMiniBtn, { borderColor: theme.primary + '30' }]} 
           onPress={() => setShowManifesto(true)}
+          activeOpacity={0.7}
         >
-          <BookOpen size={16} color={theme.primary} />
-          <Text style={[styles.manifestoMiniBtnText, { color: theme.primary }]}>{t.readManifesto}</Text>
+          <Animated.View 
+            style={[
+              styles.manifestoMiniBtn, 
+              { 
+                borderColor: theme.primary + '40', 
+                backgroundColor: theme.primary + '10',
+                opacity: blinkAnim 
+              }
+            ]}
+          >
+            <BookOpen size={14} color={theme.primary} />
+            <Text style={[styles.manifestoMiniBtnText, { color: theme.primary }]}>{t.readManifesto}</Text>
+          </Animated.View>
         </TouchableOpacity>
       </View>
 
@@ -236,16 +262,23 @@ export default function FeedScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, paddingTop: 0, paddingHorizontal: 0 },
-  header: { marginBottom: 12, alignItems: 'center', paddingHorizontal: 16 },
+  header: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center', 
+    paddingHorizontal: 16, 
+    marginTop: 8,
+    marginBottom: 16 
+  },
   searchSection: { marginBottom: 12, paddingHorizontal: 16 },
   searchContainer: { flexDirection: 'row', alignItems: 'center', height: 48, borderRadius: 24, paddingHorizontal: 16, borderWidth: 1 },
   searchInput: { flex: 1, height: '100%', marginLeft: 10, fontSize: 16 },
   filterContainer: { marginBottom: 8, paddingHorizontal: 16 },
   moodChip: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 22 },
   moodChipText: { fontSize: 14, fontWeight: '600', fontFamily: 'Nunito-Bold' },
-  greeting: { fontSize: 16, fontWeight: '500', fontFamily: 'Nunito-Regular', textAlign: 'center' },
-  manifestoMiniBtn: { flexDirection: 'row', alignItems: 'center', alignSelf: 'center', gap: 6, paddingVertical: 8, paddingHorizontal: 14, borderRadius: 14, borderWidth: 1, marginTop: 8, minHeight: 44 },
-  manifestoMiniBtnText: { fontSize: 13, fontWeight: '700', fontFamily: 'Nunito-Bold' },
+  greeting: { flex: 1, fontSize: 14, fontWeight: '600', fontFamily: 'Nunito-Bold', textAlign: 'left', lineHeight: 20 },
+  manifestoMiniBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 8, paddingHorizontal: 14, borderRadius: 20, borderWidth: 1 },
+  manifestoMiniBtnText: { fontSize: 12, fontWeight: '800', fontFamily: 'Nunito-Black', textTransform: 'uppercase' },
   empty: { textAlign: 'center', marginTop: 100, fontSize: 16, opacity: 0.6, fontFamily: 'Nunito-Regular', lineHeight: 24 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
   modalContent: { height: '80%', backgroundColor: '#FFF', borderTopLeftRadius: 24, borderTopRightRadius: 24, overflow: 'hidden' }
