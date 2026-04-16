@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+// @ts-ignore: Bypassing ESM import.meta issue by loading CJS directly
+import { persist, createJSONStorage } from 'zustand/middleware.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 
