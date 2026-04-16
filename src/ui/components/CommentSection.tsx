@@ -16,6 +16,7 @@ import {
 import { Send } from 'lucide-react-native';
 import { CommentsRepository, Comment } from '../../core/comments_repository';
 import { ThemeType } from '../theme';
+import { logger } from '../../infra/logger';
 
 interface CommentSectionProps {
   postId?: string;
@@ -51,7 +52,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
       }
       setComments(data);
     } catch (error) {
-      console.error('Erro ao carregar comentários:', error);
+      logger.error('Erro ao carregar comentários', error);
     } finally {
       setLoading(false);
     }
@@ -71,7 +72,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
       setNewComment('');
       loadComments();
     } catch (error: any) {
-      console.error('Erro ao enviar comentário:', error);
+      logger.error('Erro ao enviar comentário', error);
       Alert.alert('Erro', 'Não conseguimos salvar seu comentário. Tente novamente em breve.');
     } finally {
       setSending(false);

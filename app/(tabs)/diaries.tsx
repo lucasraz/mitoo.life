@@ -8,9 +8,12 @@ import {
   RefreshControl,
   SafeAreaView
 } from 'react-native';
+import { router } from 'expo-router';
 import { useThemePeriod } from '../../src/hooks/useThemePeriod';
 import { DiaryRepository, Diary } from '../../src/core/diary_repository';
 import { DiaryCard } from '../../src/ui/components/DiaryCard';
+import { DiarySocialRepository } from '../../src/core/diary_social_repository';
+import { logger } from '../../src/infra/logger';
 
 /**
  * 🛰️ Diaries Screen (Módulo do Diário Público)
@@ -19,6 +22,7 @@ import { DiaryCard } from '../../src/ui/components/DiaryCard';
 
 export default function DiariesScreen() {
   const [diaries, setDiaries] = useState<Diary[]>([]);
+  const [followedIds, setFollowedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   
@@ -26,10 +30,14 @@ export default function DiariesScreen() {
 
   const fetchDiaries = async () => {
     try {
-      const data = await DiaryRepository.getPublicDiaries();
+      const [data, followedList] = await Promise.all([
+        DiaryRepository.getPublicDiaries(),
+        DiarySocialRepository.getFollowedDiariesIds()
+      ]);
       setDiaries(data || []);
+      setFollowedIds(new Set(followedList));
     } catch (e) {
-      console.warn('⚠️ Erro ao buscar diários:', e);
+      logger.error('Erro ao buscar diários', e);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -64,7 +72,31 @@ export default function DiariesScreen() {
             <DiaryCard 
               diary={item} 
               theme={theme}
-              onPress={() => console.log('Abrir diário:', item.id)}
+              onPress={() => router.push(`/diary/${item.id}`)}
+              isFollowing={followedIds.has(item.id)}
+              onFollowPress={async () => {
+                const isFollowing = followedIds.has(item.id);
+                // Optimistic UI update
+                setFollowedIds(prev => {
+                  const next = new Set(prev);
+                  if (isFollowing) next.delete(item.id);
+                  else next.add(item.id);
+                  return next;
+                });
+                
+                try {
+                  await DiarySocialRepository.toggleFollowDiary(item.id);
+                } catch (error) {
+                  // Revert if error
+                  setFollowedIds(prev => {
+                    const next = new Set(prev);
+                    if (isFollowing) next.add(item.id);
+                    else next.delete(item.id);
+                    return next;
+                  });
+                  logger.error('Erro ao seguir diário', error);
+                }
+              }}
             />
           )}
           refreshControl={

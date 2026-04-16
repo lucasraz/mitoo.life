@@ -40,13 +40,18 @@ Seguimos o modelo de 3 Camadas (`AGENTS.md`):
 ---
 
 ## 🛡️ Segurança (Security First)
-- **RLS (Row Level Security)**: Crítico para garantir o anonimato. O `user_id` real nunca deve vazar em queries anônimas.
+- **RLS (Row Level Security)**: O `user_id` real nunca vaza em queries anônimas.
 - **Proteção de Alias**: A tabela `anon_identities` é protegida e nunca exposta publicamente.
-- **Sanitização**: Validação rigorosa de inputs nos relatos e comentários.
+- **Avatar Anônimo Protegido**: `avatar_url` retorna `null` para comentários anônimos *(fix crítico 2026-04-16)*.
+- **Enums de Domínio**: `mood_types.ts` define os únicos valores legais de `mood` e `period`, com guards em runtime que protegem o banco.
+- **Validação em Dupla Camada**: Frontend valida + banco tem `CHECK constraints` (posts ≤ 1000 chars, comentários ≤ 500).
+- **Search Sanitization**: `searchQuery` truncado em 100 chars antes de ir ao banco.
+- **Logger Silencioso**: Nenhum log em produção — stack traces nunca chegam ao console do browser.
+- **Git History Verificado**: `.env` nunca foi commitado. Chaves do Supabase seguras *(verificado 2026-04-16)*.
 
 ---
 
-## 📂 Estrutura do Projeto (Planejada)
+## 📂 Estrutura do Projeto
 ```text
 mitoo.life/
 ├── .agent/             # Regras de engenharia
@@ -54,11 +59,15 @@ mitoo.life/
 ├── supabase/           # Configurações, Migrations e Edge Functions
 ├── src/
 │   ├── core/           # Regras de negócio (Domain)
+│   │   ├── mood_types.ts       # Enums de humor e período (fonte única de verdade)
+│   │   ├── comments_repository.ts
+│   │   ├── posts_repository.ts
+│   │   └── ...
 │   ├── features/       # Módulos do App (Feed, Diary, Auth)
 │   ├── ui/             # Componentes, Temas e Animações
 │   ├── hooks/          # Hooks customizados (useTheme, useSupabase)
 │   └── store/          # Zustand (Global State)
-├── tests/              # Testes Automatizados (Jest - Configurado)
+├── tests/              # Testes Automatizados (Jest - 21 testes passando)
 └── ANTIGRAVITY.md      # Este documento
 ```
 
@@ -68,12 +77,15 @@ mitoo.life/
 - [x] **Setup Supabase**: Criar projeto, tabelas (`users`, `posts`, `mitoos`, `comments`) e habilitar RLS.
 - [x] **Módulo Diário (Fundação)**: Tabelas `diaries`, `diary_entries`, `diary_reactions` criadas com RLS.
 - [x] **Auth Context**: Implementar fluxo de Login/Registro com Supabase Auth (Validado com tratamento de e-mail).
-- [ ] **Diary Details**: Tela de leitura de entradas individuais e comentários de diário.
-- [ ] **Social Interactions**: Lógica de "Seguir Diário" e reações em tempo real.
+- [x] **Diary Details**: Tela de leitura de entradas individuais e comentários de diário.
+- [x] **Social Interactions**: Lógica de "Seguir Diário" e reações em tempo real *(2026-04-16)*.
 - [x] **Theme Engine**: Hook para detecção de período e aplicação de cores dinâmicas criado.
 - [x] **Comments Core**: Repositório e UI de comentários para posts e diário integrados.
 - [x] **Profile Images**: Integração com Supabase Storage e seletor de fotos no perfil.
-- [x] **Test Infrastructure**: Ambiente Jest configurado e testes de Core passando.
+- [x] **Test Infrastructure**: Ambiente Jest configurado e testes de Core passando (32 testes).
+- [x] **Multi-language Support**: Implementado suporte a PT/EN com tela de intro e logos dinâmicos.
+- [x] **New Visual Assets**: Logos primários, secundários e "M" integrados na estrutura.
 - [x] **Git Repository**: Conectado e sincronizado em: https://github.com/lucasraz/mitoo.life
 - [x] **Deployment Config**: Vercel/Cloudflare Pages configurados com redirecionamento de SPA.
-
+- [x] **Security Audit**: Varredura completa executada. CVEs corrigidos. Histórico Git verificado *(2026-04-16)*.
+- [x] **Diary Details**: Tela `diary/[id]` (lista de entradas) e `diary/entry/[entryId]` (leitura + comentários) implementadas *(2026-04-16)*.

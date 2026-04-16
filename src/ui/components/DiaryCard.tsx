@@ -8,9 +8,11 @@ interface DiaryCardProps {
   diary: Diary;
   theme: ThemeType;
   onPress?: () => void;
+  isFollowing?: boolean;
+  onFollowPress?: () => void;
 }
 
-export const DiaryCard: React.FC<DiaryCardProps> = ({ diary, theme, onPress }) => {
+export const DiaryCard: React.FC<DiaryCardProps> = ({ diary, theme, onPress, isFollowing, onFollowPress }) => {
   const authorName = diary.author_name || 'Anônimo';
   const authorInitial = authorName[0] || '?';
   const authorColor = diary.author_color || '#CCC';
@@ -41,9 +43,16 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ diary, theme, onPress }) =
             </Text>
           </View>
           
-          <TouchableOpacity style={styles.followBtn}>
-            <Users size={16} color={theme.primary} />
-            <Text style={[styles.followText, { color: theme.primary }]}>Seguir</Text>
+          <TouchableOpacity 
+            style={[styles.followBtn, isFollowing && { backgroundColor: theme.primary + '25' }]}
+            onPress={onFollowPress}
+            activeOpacity={0.7}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Users size={16} color={isFollowing ? theme.primary : theme.text} opacity={isFollowing ? 1 : 0.6} />
+            <Text style={[styles.followText, { color: isFollowing ? theme.primary : theme.text, opacity: isFollowing ? 1 : 0.8 }]}>
+              {isFollowing ? 'Seguindo' : 'Seguir'}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>

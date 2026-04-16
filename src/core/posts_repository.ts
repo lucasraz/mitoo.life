@@ -1,4 +1,9 @@
 import { supabase } from '../infra/supabase';
+import { assertValidMood, assertValidPeriod } from './mood_types';
+
+const POST_CONTENT_MIN_LENGTH = 1;
+const POST_CONTENT_MAX_LENGTH = 1000;
+const SEARCH_QUERY_MAX_LENGTH = 100;
 
 /**
  * 🛰️ Posts Repository (Camada de Intenção)
@@ -24,11 +29,25 @@ export interface Post {
   longitude?: number;
 }
 
+function validatePostContent(content: string): void {
+  const trimmed = content.trim();
+  if (trimmed.length < POST_CONTENT_MIN_LENGTH) {
+    throw new Error('O relato não pode estar vazio.');
+  }
+  if (trimmed.length > POST_CONTENT_MAX_LENGTH) {
+    throw new Error(`O relato deve ter no máximo ${POST_CONTENT_MAX_LENGTH} caracteres.`);
+  }
+}
+
+function sanitizeSearchQuery(query: string): string {
+  return query.trim().slice(0, SEARCH_QUERY_MAX_LENGTH);
+}
+
 export const PostsRepository = {
   /**
    * Busca posts públicos seguros (via View v_feed_public)
    */
-  async getPublicFeed(mood?: string, searchQuery?: string) {
+  async getPublicFeed(mood?: string, searchQuery?: string): Promise<Post[]> {
     let query = supabase
       .from('v_feed_public')
       .select('*')
@@ -39,18 +58,21 @@ export const PostsRepository = {
     }
 
     if (searchQuery) {
-      query = query.ilike('content', `%${searchQuery}%`);
+      const sanitized = sanitizeSearchQuery(searchQuery);
+      if (sanitized.length > 0) {
+        query = query.ilike('content', `%${sanitized}%`);
+      }
     }
 
     const { data, error } = await query;
     if (error) throw error;
-    return data;
+    return data as Post[];
   },
 
   /**
-   * Busca posts recentes de um usuário específico (últimos 7 dias)
+   * Busca posts recentes de um usuário específico (últimos N dias)
    */
-  async getUserRecentPosts(userId: string, days: number = 7) {
+  async getUserRecentPosts(userId: string, days: number = 7): Promise<Post[]> {
     const dateLimit = new Date();
     dateLimit.setDate(dateLimit.getDate() - days);
 
@@ -62,7 +84,7 @@ export const PostsRepository = {
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return data;
+    return data as Post[];
   },
 
   /**
@@ -76,9 +98,13 @@ export const PostsRepository = {
     is_anonymous: boolean;
     latitude?: number;
     longitude?: number;
-  }) {
+  }): Promise<void> {
     const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) throw new Error('Usuário não autenticado');
+
+    validatePostContent(payload.content);
+    assertValidMood(payload.mood);
+    assertValidPeriod(payload.period);
 
     const { data, error } = await supabase.from('posts').insert({
       user_id: userData.user.id,
@@ -87,11 +113,13 @@ export const PostsRepository = {
       mood_color: payload.mood_color,
       period: payload.period,
       is_anonymous: payload.is_anonymous,
-      location: payload.latitude ? `POINT(${payload.longitude} ${payload.latitude})` : null,
+      location: payload.latitude
+        ? `POINT(${payload.longitude} ${payload.latitude})`
+        : null,
     });
 
     if (error) throw error;
-    return data;
+    return data ?? undefined;
   },
 
   /**

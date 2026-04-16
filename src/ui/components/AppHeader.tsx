@@ -52,6 +52,11 @@ export function AppHeader() {
   const avatarInitial = (identity?.name || 'V').charAt(0).toUpperCase();
   const paddingTop = Platform.OS === 'ios' ? 46 : STATUS_BAR_HEIGHT + 8;
 
+  const language = useUIStore((state) => state.language) || 'pt';
+  const headerLogo = language === 'en'
+    ? require('../../../assets/logos/Logo secundário_EN.png')
+    : require('../../../assets/logos/Logo secundário_PT.png');
+
   return (
     <View
       style={[
@@ -72,7 +77,7 @@ export function AppHeader() {
 
         {/* Logo transparente centralizada */}
         <Image
-          source={require('../../../assets/logo.png')}
+          source={headerLogo}
           style={styles.logo}
           resizeMode="contain"
         />

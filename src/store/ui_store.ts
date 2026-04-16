@@ -1,17 +1,33 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
 
 /**
  * 🛰️ UI Store (Zustand)
- * Camada: Orquestração (Gerenciamento de estados globais de interface)
- * Controla animações e alertas de suporte SOS.
+ * Persistência estabilizada para PT/EN.
  */
 
 interface UIState {
   isSOSAlertActive: boolean;
+  language: 'pt' | 'en' | null;
   setSOSAlert: (active: boolean) => void;
+  setLanguage: (lang: 'pt' | 'en') => void;
 }
 
-export const useUIStore = create<UIState>((set) => ({
-  isSOSAlertActive: false,
-  setSOSAlert: (active) => set({ isSOSAlertActive: active }),
-}));
+export const useUIStore = create<UIState>()(
+  persist(
+    (set) => ({
+      isSOSAlertActive: false,
+      language: null,
+      setSOSAlert: (active) => set({ isSOSAlertActive: active }),
+      setLanguage: (lang) => set({ language: lang }),
+    }),
+    {
+      name: 'mitoo-ui-storage',
+      storage: createJSONStorage(() => 
+        Platform.OS === 'web' ? localStorage : AsyncStorage
+      ),
+    }
+  )
+);

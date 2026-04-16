@@ -16,6 +16,8 @@ import {
 import { useAuthStore } from '../../src/store/auth_store';
 import { useThemePeriod } from '../../src/hooks/useThemePeriod';
 import { LogIn, UserPlus } from 'lucide-react-native';
+import { useUIStore } from '../../src/store/ui_store';
+import { TRANSLATIONS } from '../../src/core/i18n';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const IS_DESKTOP = SCREEN_WIDTH > 768;
@@ -28,6 +30,12 @@ export default function LoginScreen() {
   
   const { signIn, signUp, loading } = useAuthStore();
   const theme = useThemePeriod();
+  const language = useUIStore((state) => state.language) || 'pt';
+  const t = TRANSLATIONS[language];
+
+  const loginLogo = language === 'en' 
+    ? require('../../assets/logos/Logo principal_EN.png') 
+    : require('../../assets/logos/Logo principal_PT.png');
 
   const handleAuth = async () => {
     if (!email || !password) {
@@ -58,27 +66,22 @@ export default function LoginScreen() {
       >
         <View style={styles.header}>
           <Image
-            source={require('../../assets/logo.png')}
+            source={loginLogo}
             style={styles.logoImage}
             resizeMode="contain"
           />
           <Text style={[styles.subtitle, { color: theme.text, opacity: 0.6 }]}>
-            {isLogin ? 'Aqui, cada história importa.' : 'Comece sua jornada anônima.'}
+            {isLogin ? t.loginSubtitle : t.startJourney}
           </Text>
-          {isLogin ? (
-            <Text style={[styles.subtitle, { color: theme.text, opacity: 0.5, marginTop: 4, fontSize: 14 }]}>
-              Estávamos esperando por você.
-            </Text>
-          ) : null}
         </View>
 
         <View style={styles.form}>
           {!isLogin && (
             <View style={styles.inputGroup}>
-              <Text style={[styles.label, { color: theme.text }]}>Como deseja ser chamado?</Text>
+              <Text style={[styles.label, { color: theme.text }]}>{t.nameLabel}</Text>
               <TextInput
                 style={[styles.input, { backgroundColor: theme.text + '08', color: theme.text, borderColor: theme.text + '20' }]}
-                placeholder="Seu nome real"
+                placeholder={t.namePlaceholder}
                 placeholderTextColor={theme.text + '40'}
                 value={name}
                 onChangeText={setName}
@@ -87,10 +90,10 @@ export default function LoginScreen() {
           )}
 
           <View style={styles.inputGroup}>
-            <Text style={[styles.label, { color: theme.text }]}>E-mail</Text>
+            <Text style={[styles.label, { color: theme.text }]}>{t.loginEmail}</Text>
             <TextInput
               style={[styles.input, { backgroundColor: theme.text + '08', color: theme.text, borderColor: theme.text + '20' }]}
-              placeholder="seu@email.com"
+              placeholder={t.emailPlaceholder}
               placeholderTextColor={theme.text + '40'}
               keyboardType="email-address"
               autoCapitalize="none"
@@ -100,7 +103,7 @@ export default function LoginScreen() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={[styles.label, { color: theme.text }]}>Senha</Text>
+            <Text style={[styles.label, { color: theme.text }]}>{t.loginPassword}</Text>
             <TextInput
               style={[styles.input, { backgroundColor: theme.text + '08', color: theme.text, borderColor: theme.text + '20' }]}
               placeholder="••••••••"
@@ -121,7 +124,7 @@ export default function LoginScreen() {
             ) : (
               <>
                 <Text style={styles.authBtnText}>
-                  {isLogin ? 'Acessar Essência' : 'Criar Identidade'}
+                  {isLogin ? t.loginButton : t.loginRegister}
                 </Text>
                 {isLogin ? <LogIn size={20} color="#FFF" /> : <UserPlus size={20} color="#FFF" />}
               </>
@@ -133,9 +136,9 @@ export default function LoginScreen() {
             style={styles.toggleBtn}
           >
             <Text style={[styles.toggleText, { color: theme.text }]}>
-              {isLogin ? 'Não tem uma conta? ' : 'Já possui uma identidade? '}
+              {isLogin ? t.toggleToRegister : t.toggleToLogin}
               <Text style={{ color: theme.primary, fontWeight: '800' }}>
-                {isLogin ? 'Cadastre-se' : 'Entre aqui'}
+                {isLogin ? t.registerLink : t.loginLink}
               </Text>
             </Text>
           </TouchableOpacity>
@@ -144,7 +147,7 @@ export default function LoginScreen() {
 
       <View style={styles.footer}>
         <Text style={[styles.footerText, { color: theme.text, opacity: 0.4 }]}>
-          Sua paz começa no anonimato.
+          {t.footerText}
         </Text>
       </View>
     </KeyboardAvoidingView>

@@ -1,5 +1,7 @@
 import { create } from 'zustand';
+import { type User as SupabaseUser } from '@supabase/supabase-js';
 import { supabase } from '../infra/supabase';
+import { logger } from '../infra/logger';
 import { generatePoeticAlias, PoeticIdentity } from '../core/alias_generator';
 import { Alert } from 'react-native';
 
@@ -9,7 +11,7 @@ import { Alert } from 'react-native';
  */
 
 interface AuthState {
-  user: any | null;
+  user: SupabaseUser | null;
   identity: (PoeticIdentity & { 
     realName?: string; 
     useAnonymous?: boolean;
@@ -135,7 +137,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         }]);
 
       if (profileError) {
-        console.error('⚠️ Erro ao criar perfil:', profileError);
+        logger.error('Erro ao criar perfil após cadastro', profileError);
       }
 
       // Se o usuário existir mas não tiver uma sessão ativa (comum quando verificação de e-mail está ativa)
