@@ -130,40 +130,48 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity 
-          style={[styles.avatarLarge, { backgroundColor: identity?.color || '#CCC' }]}
-          onPress={handlePickImage}
-          disabled={uploading}
-        >
-          {identity?.avatarUrl ? (
-            <Image source={{ uri: identity.avatarUrl }} style={styles.avatarImage} />
-          ) : (
-            <Text style={styles.avatarText}>{identity?.name[0] || '?'}</Text>
-          )}
-          
-          <View style={[styles.cameraOverlay, { backgroundColor: theme.primary }]}>
-            {uploading ? (
-              <ActivityIndicator size="small" color="#FFF" />
+        <View style={styles.profileRow}>
+          <TouchableOpacity 
+            style={[styles.avatarMedium, { backgroundColor: identity?.color || '#CCC' }]}
+            onPress={handlePickImage}
+            disabled={uploading}
+          >
+            {identity?.avatarUrl ? (
+              <Image source={{ uri: identity.avatarUrl }} style={styles.avatarImageMedium} />
             ) : (
-              <Camera size={16} color="#FFF" />
+              <Text style={styles.avatarTextMedium}>{identity?.name[0] || '?'}</Text>
             )}
+            
+            <View style={[styles.cameraOverlaySmall, { backgroundColor: theme.primary }]}>
+              {uploading ? (
+                <ActivityIndicator size="small" color="#FFF" />
+              ) : (
+                <Camera size={14} color="#FFF" />
+              )}
+            </View>
+          </TouchableOpacity>
+          
+          <View style={styles.profileDetails}>
+            <Text style={[styles.poeticName, { color: theme.text }]} numberOfLines={1}>
+              {identity?.name || 'Visitante'}
+            </Text>
+            
+            <View style={styles.bioContainer}>
+              <TextInput
+                style={[styles.bioInput, { color: theme.text, backgroundColor: theme.primary + '08' }]}
+                value={identity?.bio || ''}
+                onChangeText={(txt) => useAuthStore.getState().updateBio(txt)}
+                placeholder="Sua frase de impacto..."
+                placeholderTextColor={theme.text + '40'}
+                maxLength={50}
+                multiline={true}
+              />
+              <Text style={[styles.charCount, { color: theme.text }]}>
+                {(identity?.bio?.length || 0)}/50
+              </Text>
+            </View>
           </View>
-        </TouchableOpacity>
-        
-        <Text style={[styles.poeticName, { color: theme.text }]}>{identity?.name || 'Visitante'}</Text>
-        
-        <TextInput
-          style={[styles.bioInput, { color: theme.text, backgroundColor: theme.primary + '08' }]}
-          value={identity?.bio || ''}
-          onChangeText={(txt) => useAuthStore.getState().updateBio(txt)}
-          placeholder="Sua frase de impacto..."
-          placeholderTextColor={theme.text + '40'}
-          maxLength={50}
-          multiline={false}
-        />
-        <Text style={[styles.charCount, { color: theme.text }]}>
-          {(identity?.bio?.length || 0)}/50
-        </Text>
+        </View>
       </View>
 
       <View style={styles.statsContainer}>
@@ -278,71 +286,85 @@ const styles = StyleSheet.create({
   logoutBtn: {
     padding: 8,
   },
-  avatarLarge: { 
-    width: 120, 
-    height: 120, 
-    borderRadius: 60, 
+  profileRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    gap: 16,
+    paddingHorizontal: 4,
+  },
+  avatarMedium: { 
+    width: 90, 
+    height: 90, 
+    borderRadius: 45, 
     justifyContent: 'center', 
     alignItems: 'center',
-    marginBottom: 16,
     position: 'relative',
     ...Platform.select({
       ios: {
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.2,
-        shadowRadius: 12,
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.15,
+        shadowRadius: 8,
       },
       android: {
-        elevation: 8,
+        elevation: 6,
       }
     })
   },
-  avatarImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+  avatarImageMedium: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
   },
-  cameraOverlay: {
+  cameraOverlaySmall: {
     position: 'absolute',
     bottom: 0,
     right: 0,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 3,
+    borderWidth: 2,
     borderColor: '#FFF',
   },
-  avatarText: { 
+  avatarTextMedium: { 
     color: '#FFF', 
-    fontSize: 48, 
+    fontSize: 36, 
     fontWeight: '800',
     fontFamily: 'System'
   },
+  profileDetails: {
+    flex: 1,
+    justifyContent: 'center',
+  },
   poeticName: { 
-    fontSize: 26, 
+    fontSize: 22, 
     fontWeight: '800', 
     marginBottom: 4,
-    fontFamily: 'System' 
+    fontFamily: 'System',
+    textAlign: 'left'
+  },
+  bioContainer: {
+    width: '100%',
   },
   bioInput: {
     width: '100%',
-    textAlign: 'center',
+    textAlign: 'left',
     fontSize: 14,
     paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 16,
-    marginTop: 8,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    marginTop: 4,
     fontFamily: 'System',
+    minHeight: 44,
   },
   charCount: {
     fontSize: 10,
-    opacity: 0.3,
+    opacity: 0.4,
     alignSelf: 'flex-end',
     marginTop: 4,
-    marginRight: 4,
   },
   statsContainer: { 
     flexDirection: 'row', 
